@@ -1,11 +1,13 @@
 {
+  "type": "module",
   "name": "lagrandebot-db",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon -q index.js "
+    "dev": "nodemon -q index.js",
+    "db-mac": "brew services start mongodb-community@5.0"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +15,7 @@
   "dependencies": {
     "body-parser": "^1.19.2",
     "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "mongodb": "^4.4.1",
     "nodemon": "^2.0.15"
