@@ -1,6 +1,10 @@
-export const UpdateMoney = (collection, user, value) => {
+export const UpdateMoney = async (collection, user, value) => {
     let response = false;
-    collection.updateOne({ "name": user }, { $set: { "money": value } })
+    value = parseInt(value);
+    await collection.updateOne({ "name": user }, { 
+        $inc: 
+            { "money": value } 
+        })
     .then((result) => {
         response = true;
     })
@@ -11,21 +15,30 @@ export const UpdateMoney = (collection, user, value) => {
     return response;
 }
 
-export const UpdateTransaktions = (collection, user, newMoney, newAmount, newSpent) => {
+export const UpdateTransactions = async (collection, user, value) => {
     let response = false;
-    collection.updateOne({ "name": user }, { 
-        $set: { 
-            "money": newMoney, 
-            "amountBought": newAmount, 
-            "priceBought": newSpent 
-        } 
-    })
-    .then((result) => {
+    if (typeof(value) == Number) {
+        let cost = value * -1;
+        cost = parseInt(value)
+        console.log(cost);
+        value = parseInt(value);
+        await collection.updateOne({ "name": user }, { 
+            $inc: { 
+                "money": cost, 
+                "amount": 1, 
+                "price": value
+            } 
+        })
+        .then((result) => {
+            response = true;
+        })
+        .catch((error) => {
+            console.error(error);
+            response = false;
+        });
+    }
+    else if (typeof(value) === undefined) {
         response = true;
-    })
-    .catch((error) => {
-        console.error(error);
-        response = false;
-    })
+    }
     return response;
 }

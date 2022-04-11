@@ -2,7 +2,7 @@
 import { FindDuplicateName, FindAll, FindName } from './components/read.js';
 import { InsertOne } from './components/create.js';
 import { createRequire } from 'module';
-import { UpdateMoney } from './components/update.js';
+import { UpdateMoney, UpdateTransactions } from './components/update.js';
 const require = createRequire(import.meta.url);
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -40,7 +40,6 @@ MongoClient.connect(process.env.url, { useNewUrlParser: true })
         app.get("/menu", (req, res) => {
             FindAll(menuCollection)
             .then((result) => {
-                console.log(result)
                 if (result) {
                     res.status(200).send(result);
                 }
@@ -53,7 +52,6 @@ MongoClient.connect(process.env.url, { useNewUrlParser: true })
         app.get("/leaderboard", (req, res) => {
             FindAll(accountCollection)
             .then((result) => {
-                console.log(result);
                 if (result) {
                     res.status(200).send(result);
                 }
@@ -75,22 +73,24 @@ MongoClient.connect(process.env.url, { useNewUrlParser: true })
             });
         });
 
-        app.post('/addMoney', (req, res) => {
+        app.post('/updateMoney', (req, res) => {
             let name = req.body.name;
+            let money = req.body.money;
             FindName(accountCollection, name)
             .then((result) => {
                 if (result.success) {
-                    console.log(result);
-                    // let newMoney = Int(result.object.money) + Int(req.price);
-                    // UpdateMoney(accountCollection, newMoney)
-                    // .then((result) => {
-                    //     if (result) {
-                    //         res.status(200).send({message: "Pengar uppdaterade"});
-                    //     }
-                    //     else {
-                    //         res.status(500).send({message: "Något gick snett, bäst att skylla på William!:rage:"});
-                    //     }
-                    // })
+                    if (!result.person) return false;
+                    else {
+                        UpdateMoney(accountCollection, name, money)
+                        .then((result) => {
+                            if (result) {
+                                res.status(200).send({message: "Pengar uppdaterade"});
+                            }
+                            else {
+                                res.status(500).send({message: "Något gick snett, bäst att skylla på William!:rage:"});
+                            }
+                        });
+                    }
                 }
                 else {
                     res.status(403).send({message: 'Pengarna uppdaterades inte.'});
@@ -100,38 +100,29 @@ MongoClient.connect(process.env.url, { useNewUrlParser: true })
 
         app.post('/foodTransaction', (req, res) => {
             let name = req.body.name;
+            let money = req.body.money;
             FindName(accountCollection, name)
             .then((result) => {
                 if (result.success) {
-                    console.log(result.person);
-                    console.log(req.body)
+                    UpdateTransactions(accountCollection, name, money)
+                    .then((result) => {
+                        if (result) {
+                            res.status(200).send({message: "Transaktionen gick igenom"}); 
+                        }
+                        else {
+                            res.status(403).send({message: "Ingen transaktion gick igenom"});
+                        }
+                    });
 
-
-                    
-                    let newMoney = Number(result.person[0].money) - (Number(req.price) * Number(req.amount));
-                    let newAmount = Number(result.person[0].bought) + Number(1);
-                    let newSpent = Number(result.person.spent) + Number(req.price);
-                    console.log(newMoney, newAmount, newSpent);
-                    // UpdateMoney(accountCollection, name, newMoney, newAmount, newSpent)
-                    // .then((result) => {
-                    //     if (result) {
-                    //         res.status(200).send({message: "Pengar uppdaterade"});
-                    //     }
-                    //     else {
-                    //         res.status(500).send({message: "Något gick snett, bäst att skylla på William!:rage:"});
-                    //     }
-                    // })
-                    res.status(200).send({message: "Hej"});
                 }
                 else {
-                    res.status(403).send({message: 'Pengarna uppdaterades inte.'});
+                    res.status(403).send({message: 'Transaktionen uppdaterades inte.'});
                 }
             });
         });
         //Create Menu item
         app.post('/createMenuItem', (req, res) => {
             let name = req.body.name;
-            console.log(req.body);
 
             FindDuplicateName(menuCollection, name)
             .then((result) => {
@@ -157,7 +148,6 @@ MongoClient.connect(process.env.url, { useNewUrlParser: true })
         //Create person
         app.post('/createPerson', (req, res) => {
             let name = req.body.name;
-            console.log(req.body);
 
             FindDuplicateName(accountCollection, name)
             .then((result) => {
@@ -183,7 +173,6 @@ MongoClient.connect(process.env.url, { useNewUrlParser: true })
         //Create keyword
         app.post('/createKeyword', (req, res) => {
             let name = req.body.keyword;
-            console.log(req.body);
 
             FindDuplicateName(keywordCollection, name)
             .then((result) => {

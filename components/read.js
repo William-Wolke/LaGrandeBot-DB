@@ -38,7 +38,6 @@ export const FindAll = async (collection) => {
     
     await collection.find({}).toArray()
     .then((result) => {
-        console.log(result);
         returnThing = result;
     })            
     .catch(error => {
