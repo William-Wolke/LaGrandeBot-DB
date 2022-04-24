@@ -1,38 +1,44 @@
 //Import modules
-import { FindDuplicateName, FindAll, FindName } from './components/read.js';
-import { InsertOne } from './components/create.js';
-import { createRequire } from 'module';
-import { UpdateMoney, UpdateTransactions } from './components/update.js';
-const require = createRequire(import.meta.url);
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+const menu = require('./routes/menu');
+const user = require('./routes/user');
+const keyword = require('./routes/keyword');
+
 const app = express();
 
+const options = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000,
+    autoIndex: false, // Don't build indexes
+    maxPoolSize: 10, // Maintain up to 10 socket connections
+    serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+    socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+    family: 4 // Use IPv4, skip trying IPv6
+}
+
 //Connect to Mongo db
-mongoose.connect(process.env.url, { useNewUrlParser: true });
+mongoose.connect(process.env.url, options);
 
 const db = mongoose.connection;
 db.on('error', (error) => console.error(error));
 db.once('open', () => console.log('Connected'));
 
-app.use(express.json)
+// app.use(express.json);
 app.use(bodyParser.urlencoded({ extended: true}));
+app.use(express.urlencoded({ extended: true }))
 app.use(cors({
     origin: "*",
     methods: ['GET', 'POST']
 }));
 
-const grandeRouter = require('./routes/grande');
-app.use('/grande');
+app.use('/menu', menu);
+app.use('/keyword', keyword);
+app.use('/user', user);
+// app.use('/nft', require('./routes/nft'));
 
-    /*.then(client => {
-        // Storing a reference to the database so you can use it later
-        const db = client.db(process.env.dbName)
-        const accountCollection = db.collection(process.env.accounts);
-        const menuCollection = db.collection(process.env.menus);
-        const keywordCollection = db.collection(process.env.keywords);
-        console.log(`Connected MongoDB: ${process.env.url}`);
-        console.log(`Database: ${process.env.dbName}`);*/
+app.listen(process.env.port, () => console.log(`Server Started on port ${process.env.port}`));
