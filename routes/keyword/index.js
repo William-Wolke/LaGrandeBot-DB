@@ -25,14 +25,13 @@ router.post('/create', async (req, res) => {
         if (name === undefined) return res.status(403).json({message: "Inget namn angavs"});
         let result = await Keyword.findDuplicateName(name)
         if (result) {
-            res.status(403).json({message: `Nyckelordet ${name} finns redan`});
-            return;
+            return res.status(403).json({message: `Nyckelordet ${name} finns redan`});
         }
         const keywordItem = new Keyword();
         keywordItem.name = name;
         if (req.body.callBack) keywordItem.callBack = req.body.callBack;
         await keywordItem.save();
-        res.status(201).json({message: "Nyckelord skapat"});
+        return res.status(201).json({message: "Nyckelord skapat"});
 
     } catch (e) {
         console.log(e.message);

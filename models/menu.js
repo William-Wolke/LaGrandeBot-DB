@@ -9,7 +9,6 @@ const menuSchema = new mongoose.Schema({
   },
   price: {
     type: Number,
-    required: true,
     min: 1,
     default: menuDefault.price
   },
@@ -21,7 +20,6 @@ const menuSchema = new mongoose.Schema({
   },
   emoji: {
     type: String,
-    required: true,
     default: menuDefault.emoji,
     trim: true,
     lowercase: true,
