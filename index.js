@@ -1,12 +1,15 @@
 //Import modules
+require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config();
 const menu = require('./routes/menu');
 const user = require('./routes/user');
 const keyword = require('./routes/keyword');
+const nft = require('./routes/nft');
+
 
 const app = express();
 
@@ -20,6 +23,8 @@ const options = {
     socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
     family: 4 // Use IPv4, skip trying IPv6
 }
+
+const dir = path.join(__dirname, 'public');
 
 //Connect to Mongo db
 mongoose.connect(process.env.url, options);
@@ -35,10 +40,12 @@ app.use(cors({
     origin: "*",
     methods: ['GET', 'POST']
 }));
-
+//Serve static files
+app.use('/statics', express.static(dir));
+//Use other routers
 app.use('/menu', menu);
 app.use('/keyword', keyword);
 app.use('/user', user);
-// app.use('/nft', require('./routes/nft'));
+app.use('/nft', nft);
 
 app.listen(process.env.port, () => console.log(`Server Started on port ${process.env.port}`));
