@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon -q index.js",
+    "start-db": "docker compose up",
     "db-mac": "brew services start mongodb-community@5.0"
   },
   "keywords": [],
